@@ -1,0 +1,19 @@
+How to Run the Project:
+
+    1.Install Extensions:
+        1.1 Install the Live Server extension in your code editor (e.g., VS Code).
+        1.2 Install the p5.vscode extension for p5.js support.
+
+    2.Add Your Video File (Place your video clip in the project folder.)
+   
+    3.Set the Video Path
+        3.1 Open the sketch.js file.
+        3.2 On line 33, replace the video path with the relative path to your video file.
+
+    4.Open the Project in the Browser
+        4.1 Open the index.html file.
+        4.2 Right-click on the file and select "Open with Live Server".
+
+    5.Start the Video Playback:
+        5.1 Click on the "Click Me" button on the webpage until the video starts playing.
+            (Note: Modern browsers require user interaction, like a click, to enable video playback for security reasons.)

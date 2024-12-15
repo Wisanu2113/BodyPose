@@ -5,8 +5,12 @@ let hands = [];
 let emitters = [];
 let img;
 
+let bodyPose;
+let poses = [];
+
 function preload() {
   handPose = ml5.handPose();
+  bodyPose = ml5.bodyPose();
 }
 
 function mousePressed() {
@@ -17,33 +21,32 @@ function gotHands(results) {
   hands = results;
 }
 
+function gotPoses(results) {
+  poses = results;
+}
+
 // 960,540
 //1920,1080
 //1152,648
 function setup() {
-  let canvas = createCanvas(1152,648);
-  canvas.id('myCanvas');
-
-  // แทนที่ createCapture ด้วย createVideo
-  video = createVideo('nub.mov', videoLoaded);
+  createCanvas(1152,648);
+  video = createVideo('nub.mov');
   video.size(1152,648);
-  video.hide(); // ซ่อนวิดีโอ HTML DOM
-
-  // สร้าง emitter แค่หนึ่งตัว
+  video.hide(); 
+  video.loop(); 
+  video.volume(1); 
+ 
+  handPose.detectStart(video, gotHands);
   emitters.push(new Emitter(width / 2, height / 2));
-
+  
+  bodyPose.detectStart(video, gotPoses);
+  connections = bodyPose.getConnections();
   background(0);
-}
-
-function videoLoaded() {
-  video.loop(); // เล่นวิดีโอซ้ำ
-  video.volume(0); // ปิดเสียง
-  handPose.detectStart(video, gotHands); // เริ่มตรวจจับจากวิดีโอ
 }
 
 function draw() {
   clear();
-  image(video, 0, 0);
+  image(video, 0, 0, width, height);
   blendMode(ADD);
 
   // ตรวจสอบว่ามีการตรวจจับมือ
@@ -65,4 +68,34 @@ function draw() {
   for (let emitter of emitters) {
     emitter.run();
   }
+
+
+  //BodyPose
+  for (let i = 0; i < poses.length; i++) {
+    let pose = poses[i];
+    for (let j = 0; j < connections.length; j++) {
+      let pointAIndex = connections[j][0];
+      let pointBIndex = connections[j][1];
+      let pointA = pose.keypoints[pointAIndex];
+      let pointB = pose.keypoints[pointBIndex];
+      if (pointA.confidence > 0.1 && pointB.confidence > 0.1) {
+        stroke(0, 255, 0);
+        strokeWeight(2);
+        line(pointA.x, pointA.y, pointB.x, pointB.y);
+      }
+    }
+  }
+  for (let i = 0; i < poses.length; i++) {
+    let pose = poses[i];
+    for (let j = 0; j < pose.keypoints.length; j++) {
+      let keypoint = pose.keypoints[j];
+      if (keypoint.confidence > 0.1) {
+        fill(0, 255, 0);
+        noStroke();
+        circle(keypoint.x, keypoint.y, 10);
+      }
+    }
+  }
+
+
 }
